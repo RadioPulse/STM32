@@ -17,9 +17,9 @@ If you want to build a project with Makefile, follow this guide.
 
 2. Build specific project
 
-> $ make <project_name>
+> $ make <project_name>\_<app\_name>
 >
-> Ex) $ make stm32f401re-nucleo
+> Ex) $ make stm32f401re-nucleo\_freertos
 
 ### Run
 
@@ -31,7 +31,7 @@ You can program your board with binary file.
 
 - Host System
 
-  - Tested on Ubuntu 4.4.0
+  - Tested on Ubuntu 4.4.0-98-generic
 
 - Target System
 
