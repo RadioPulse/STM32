@@ -12,10 +12,15 @@ JOB	:= -j$(shell getconf _NPROCESSORS_ONLN)
 OPT	:= --no-print-directory
 
 all:
-	@make $(JOB) $(OPT) -f projects/stm32f401re-nucleo/Makefile
+	@make $(JOB) $(OPT) -f projects/stm32f401re-nucleo_uart/Makefile
+	@make $(JOB) $(OPT) -f projects/stm32f401re-nucleo_freertos/Makefile
 
-stm32f401re-nucleo:
-	@make $(JOB) $(OPT) -f projects/stm32f401re-nucleo/Makefile
+stm32f401re-nucleo_freertos:
+	@make $(JOB) $(OPT) -f projects/stm32f401re-nucleo_freertos/Makefile
+
+stm32f401re-nucleo_uart:
+	@make $(JOB) $(OPT) -f projects/stm32f401re-nucleo_uart/Makefile
 
 clean:
-	@make $(JOB) $(OPT) -f projects/stm32f401re-nucleo/Makefile clean
+	@make $(JOB) $(OPT) -f projects/stm32f401re-nucleo_freertos/Makefile clean
+	@make $(JOB) $(OPT) -f projects/stm32f401re-nucleo_uart/Makefile clean

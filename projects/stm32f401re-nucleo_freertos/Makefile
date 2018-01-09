@@ -16,32 +16,54 @@ OBJCOPY	:= $(ARM_GCC)objcopy
 OBJDUMP	:= $(ARM_GCC)objdump
 SIZE		:= $(ARM_GCC)size
 
-TARGET		:= hUart
+TARGET		:= hFreeRTOS
 MCU				:= stm32f401re
 BOARD			:= stm32f401re-nucleo
-APP				:= uart
+APP				:= freertos
 
-BUILD_DIR	:= projects/$(BOARD)/build
+BUILD_DIR	:= projects/$(BOARD)_$(APP)/build
 BIN_DIR		:= projects/bin
 OBJ_DIR		:= $(BUILD_DIR)/obj
 DEP_DIR		:= $(BUILD_DIR)/dep
 
 OBJS			:= $(patsubst %.s,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/startup/*.s))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/cmsis/*.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/*.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_cortex.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dma.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dma_ex.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash_ex.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_gpio.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_pwr.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_rcc.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_rcc_ex.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_tim.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_uart.c))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard bsp/$(BOARD)/*.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard projects/$(BOARD)/*.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard apps/$(APP)/*.c))
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard middlewares/freertos/*.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard projects/$(BOARD)_$(APP)/*.c))
 DEPS			:= $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/cmsis/*.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/*.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_cortex.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dma.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dma_ex.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash_ex.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_gpio.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_pwr.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_rcc.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_rcc_ex.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_tim.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_uart.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard bsp/$(BOARD)/*.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard projects/$(BOARD)/*.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard apps/$(APP)/*.c)))
+						 $(patsubst %.c,%.d,$(notdir $(wildcard middlewares/freertos/*.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard projects/$(BOARD)_$(APP)/*.c)))
 INCLUDES	:= -Idrivers/$(MCU)/cmsis	\
 						 -Idrivers/$(MCU)/hal	\
 						 -Ibsp/$(BOARD)	\
-						 -Iprojects/$(BOARD)	\
-						 -Iapps/$(APP)
+						 -Imiddlewares/freertos	\
+						 -Iprojects/$(BOARD)_$(APP)
 LINKER_SCRIPT	:= drivers/$(MCU)/linker/STM32F401VEHx_FLASH.ld
 
 # -mfpu=fpv4-sp-d16: floating point version 4 single precision d registers 16
@@ -100,8 +122,7 @@ CC_FLAGS	:= $(CPU) -fno-common -fsigned-char -fmessage-length=0	\
 LD_FLAGS		:= $(CPU) -specs=nosys.specs	\
 							 -specs=nano.specs -u _printf_float -u _scanf_float	\
 							 -Wl,--gc-sections -Wl,-Map,$(OBJ_DIR)/$(TARGET).map,--cref
-CC_SYMBOLS	:= -DNDEBUG -DSTM32F401xE -DUSE_HAL_DRIVER -DUSE_FULL_ASSERT	\
-							 -DUSE_STM32F4XX_NUCLEO
+CC_SYMBOLS	:= -DNDEBUG -DSTM32F401xE -DUSE_HAL_DRIVER -DUSE_STM32F4XX_NUCLEO
 
 all: make_directory $(BIN_DIR)/$(TARGET).bin $(OBJ_DIR)/$(TARGET).lst
 
