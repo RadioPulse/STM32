@@ -36,8 +36,11 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
+// System Header
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_it.h"
+// Uart Header
+#include "uart.h"
 
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
@@ -148,11 +151,8 @@ void PendSV_Handler(void)
 
 /**
   * @brief  This function handles SysTick Handler.
-  * @param  None
-  * @retval None
   */
-void SysTick_Handler(void)
-{
+void SysTick_Handler(void) {
   HAL_IncTick();
 }
 
@@ -162,6 +162,14 @@ void SysTick_Handler(void)
 /*  available peripheral interrupt handler's name please refer to the startup */
 /*  file (startup_stm32f4xx.s).                                               */
 /******************************************************************************/
+
+/**
+ *	@brief	This function handles USART2 global interrupt.
+ */
+void USART2_IRQHandler(void) {
+	HAL_UART_IRQHandler(&hUart2);
+}
+
 
 /**
   * @brief  This function handles PPP interrupt request.

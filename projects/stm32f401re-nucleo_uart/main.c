@@ -31,17 +31,23 @@ int main(void) {
 	puts("");
 	puts("Hello World!\r");
 
+	// Test getchar()
 	uint8_t ch;
 	printf("Input char: ");
 	ch = getchar();
 	puts("\r");
 	printf("Your input is %c.\r\n", ch);
 
+	// Test floating point printf/scanf
 	float f;
 	printf("Input float number: ");
 	scanf("%f", &f);
 	puts("\r");
 	printf("Your input is %f.\r\n", f);
+
+	char test[] = "This is a test string\r\n";
+	HAL_UART_Transmit(&hUart2, (uint8_t*)test, sizeof(test), 0xffff);
+	HAL_UART_Transmit_IT(&hUart2, (uint8_t*)test, sizeof(test));
 
 	while (1) {
 		BSP_LED_Toggle(LED2);

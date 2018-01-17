@@ -29,33 +29,37 @@ DEP_DIR		:= $(BUILD_DIR)/dep
 OBJS			:= $(patsubst %.s,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/startup/*.s))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/cmsis/*.c))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_adc.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_adc_ex.c))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_cortex.c))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dma.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dmai_ex.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dma_ex.c))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash.c))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash_ex.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash_ramfunc.c))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_gpio.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_pwr.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_pwr_ex.c))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_rcc.c))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_rcc_ex.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_spi.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_tim.c))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_tim_ex.c))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_uart.c))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard bsp/$(BOARD)/*.c))	\
 						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard projects/$(BOARD)_$(APP)/*.c))
 DEPS			:= $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/cmsis/*.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_adc.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_adc_ex.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_cortex.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dma.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dma_ex.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash_ex.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash_ramfunc.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_gpio.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_pwr.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_pwr_ex.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_rcc.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_rcc_ex.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_spi.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_tim.c)))	\
+						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_tim_ex.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_uart.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard bsp/$(BOARD)/*.c)))	\
 						 $(patsubst %.c,%.d,$(notdir $(wildcard projects/$(BOARD)_$(APP)/*.c)))
@@ -131,7 +135,7 @@ make_directory:
 	@mkdir -p $(DEP_DIR)
 
 $(BIN_DIR)/$(TARGET).bin: $(BIN_DIR)/$(TARGET).elf
-	@$(OBJCOPY) -O binary $< $@
+	@$(OBJCOPY) -O binary -S $< $@
 	@du -ch $(BIN_DIR)/$(TARGET).bin
 
 $(OBJ_DIR)/$(TARGET).lst: $(BIN_DIR)/$(TARGET).elf

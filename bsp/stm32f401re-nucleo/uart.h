@@ -42,6 +42,9 @@ typedef enum _eUART_STATUS {
 	eUART_STATUS_INIT_FAIL,
 } eUART_STATUS;
 
+/* Global Variables ----------------------------------------------------------*/
+extern UART_HandleTypeDef	hUart2;
+
 /* APIs ----------------------------------------------------------------------*/
 /**
  * @brief				Initialize UART.

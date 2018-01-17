@@ -21,24 +21,24 @@
 	#define GETCHAR_PROTOTYPE int fgetc(FILE* f)
 #endif
 
-/* Private Variables ---------------------------------------------------------*/
-UART_HandleTypeDef	uartHandle;
+/* Global Variables ----------------------------------------------------------*/
+UART_HandleTypeDef	hUart2;
 
-/* Private Function Prototypes -----------------------------------------------*/
+/* System Function Prototypes ------------------------------------------------*/
 PUTCHAR_PROTOTYPE;
 GETCHAR_PROTOTYPE;
 
 /* APIs ----------------------------------------------------------------------*/
 eUART_STATUS uart_init(uint32_t baudrate) {
-	uartHandle.Instance = USARTx;
-	uartHandle.Init.BaudRate = baudrate;
-	uartHandle.Init.WordLength = UART_WORDLENGTH_8B;
-	uartHandle.Init.StopBits = UART_STOPBITS_1;
-	uartHandle.Init.Parity = UART_PARITY_NONE;
-	uartHandle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-	uartHandle.Init.Mode = UART_MODE_TX_RX;
-	uartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
-	if (HAL_UART_Init(&uartHandle) != HAL_OK) {
+	hUart2.Instance = USARTx;
+	hUart2.Init.BaudRate = baudrate;
+	hUart2.Init.WordLength = UART_WORDLENGTH_8B;
+	hUart2.Init.StopBits = UART_STOPBITS_1;
+	hUart2.Init.Parity = UART_PARITY_NONE;
+	hUart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	hUart2.Init.Mode = UART_MODE_TX_RX;
+	hUart2.Init.OverSampling = UART_OVERSAMPLING_16;
+	if (HAL_UART_Init(&hUart2) != HAL_OK) {
 		return eUART_STATUS_INIT_FAIL;
 	}
 
@@ -48,19 +48,18 @@ eUART_STATUS uart_init(uint32_t baudrate) {
 
 /* System Functions ----------------------------------------------------------*/
 PUTCHAR_PROTOTYPE {
-	HAL_UART_Transmit(&uartHandle, (uint8_t*)&ch, 1, 0xffff);
+	HAL_UART_Transmit(&hUart2, (uint8_t*)&ch, 1, 0xffff);
 	return ch;
 }
 
 GETCHAR_PROTOTYPE {
 	int ch;
-	HAL_UART_Receive(&uartHandle, (uint8_t*)&ch, 1, 0xffff);
+	HAL_UART_Receive(&hUart2, (uint8_t*)&ch, 1, 0xffff);
 	return ch;
 }
 
 /* MSP Functions -------------------------------------------------------------*/
 void HAL_UART_MspInit(UART_HandleTypeDef* huart) {
-	(void)huart;
 	GPIO_InitTypeDef	GPIO_InitStruct;
 
 	USARTx_TX_GPIO_CLK_ENABLE();
@@ -77,13 +76,23 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart) {
   GPIO_InitStruct.Pin = USARTx_RX_PIN;
   GPIO_InitStruct.Alternate = USARTx_RX_AF;
   HAL_GPIO_Init(USARTx_RX_GPIO_PORT, &GPIO_InitStruct);
+
+	if (huart->Instance == USART2) {
+		// USART2 interrupt init
+		HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+		HAL_NVIC_EnableIRQ(USART2_IRQn);
+	}
 }
 
 void HAL_UART_MspDeInit(UART_HandleTypeDef* huart) {
-	(void)huart;
   USARTx_FORCE_RESET();
   USARTx_RELEASE_RESET();
 
   HAL_GPIO_DeInit(USARTx_TX_GPIO_PORT, USARTx_TX_PIN);
   HAL_GPIO_DeInit(USARTx_RX_GPIO_PORT, USARTx_RX_PIN);
+
+	if (huart->Instance == USART2) {
+		// USART2 interrupt deinit
+		HAL_NVIC_DisableIRQ(USART2_IRQn);
+	}
 }
