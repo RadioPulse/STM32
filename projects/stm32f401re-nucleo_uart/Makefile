@@ -9,7 +9,7 @@
 ################################################################################
 
 ARM_GCC	:= arm-none-eabi-
-AS			:= $(ARM_GCC)as
+AS			:= $(ARM_GCC)gcc
 CC			:= $(ARM_GCC)gcc
 LD			:= $(ARM_GCC)gcc
 OBJCOPY	:= $(ARM_GCC)objcopy
@@ -26,52 +26,39 @@ BIN_DIR		:= projects/bin
 OBJ_DIR		:= $(BUILD_DIR)/obj
 DEP_DIR		:= $(BUILD_DIR)/dep
 
-OBJS			:= $(patsubst %.s,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/startup/*.s))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/cmsis/*.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_cortex.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dma.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dma_ex.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash_ex.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash_ramfunc.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_gpio.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_pwr.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_pwr_ex.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_rcc.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_rcc_ex.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_tim.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_tim_ex.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_uart.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard bsp/$(BOARD)/*.c))	\
-						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(wildcard projects/$(BOARD)_$(APP)/*.c))
-DEPS			:= $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/cmsis/*.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_cortex.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dma.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_dma_ex.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash_ex.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_flash_ramfunc.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_gpio.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_pwr.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_pwr_ex.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_rcc.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_rcc_ex.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_tim.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_tim_ex.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard drivers/$(MCU)/hal/stm32f4xx_hal_uart.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard bsp/$(BOARD)/*.c)))	\
-						 $(patsubst %.c,%.d,$(notdir $(wildcard projects/$(BOARD)_$(APP)/*.c)))
+ASM_SRCS	:= drivers/$(MCU)/startup/startup_stm32f401xe.s
+C_SRCS		:= drivers/$(MCU)/cmsis/system_stm32f4xx.c	\
+						 drivers/$(MCU)/hal/stm32f4xx_hal.c	\
+						 drivers/$(MCU)/hal/stm32f4xx_hal_cortex.c	\
+						 drivers/$(MCU)/hal/stm32f4xx_hal_dma.c	\
+						 drivers/$(MCU)/hal/stm32f4xx_hal_dma_ex.c	\
+						 drivers/$(MCU)/hal/stm32f4xx_hal_gpio.c	\
+						 drivers/$(MCU)/hal/stm32f4xx_hal_rcc.c	\
+						 drivers/$(MCU)/hal/stm32f4xx_hal_rcc_ex.c	\
+						 drivers/$(MCU)/hal/stm32f4xx_hal_uart.c	\
+						 bsp/$(BOARD)/stm32f4xx_nucleo.c	\
+						 bsp/$(BOARD)/uart.c	\
+						 projects/$(BOARD)_$(APP)/stm32f4xx_it.c	\
+						 projects/$(BOARD)_$(APP)/syscalls.c	\
+						 projects/$(BOARD)_$(APP)/main.c
+OBJS			:= $(patsubst %.s,$(OBJ_DIR)/%.o,$(notdir $(ASM_SRCS)))	\
+						 $(patsubst %.c,$(OBJ_DIR)/%.o,$(notdir $(C_SRCS)))
+DEPS			:= $(patsubst %.c,$(DEP_DIR)/%.d,$(notdir $(C_SRCS)))
 INCLUDES	:= -Idrivers/$(MCU)/cmsis	\
 						 -Idrivers/$(MCU)/hal	\
 						 -Ibsp/$(BOARD)	\
 						 -Iprojects/$(BOARD)_$(APP)
 LINKER_SCRIPT	:= drivers/$(MCU)/linker/STM32F401VEHx_FLASH.ld
 
+vpath %.s $(sort $(dir $(ASM_SRCS)))
+vpath %.c $(sort $(dir $(C_SRCS)))
+
 # -mfpu=fpv4-sp-d16: floating point version 4 single precision d registers 16
 CPU					:= -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16
-AS_FLAGS		:= $(CPU)
+#	-x <language>: Specify explicitly the language for the following input files.
+#		assembler
+#		assemler-with-cpp
+AS_FLAGS		= $(CPU) -x assembler $(CC_FLAGS)
 # -ffreestanding: Assert that compilation targets a freestanding environment.
 #  								This implies -fno-builtin. This is equivalent to -fno-hosted.
 # -fno-common: In C code, controls the placement of uninitialized global
@@ -101,11 +88,20 @@ AS_FLAGS		:= $(CPU)
 #  				 information. The default level is 2.
 # 	'-g3': Level3 includes extra information, such as all the macro definitions
 # 				 present in the program.
-# -MM: Like -M but do not mention header files that are found in system header
-#  		 directories, nor header files that are included, directly or indirectly,
-#  		 from such a header.
+# -M: Instead of outputting the result of preprocessing, output a rule suitable
+#  		for make describing the dependencies of the main source file.
+# -MM: Like '-M' but do not mention header files that are found in system
+# 		 header directories, nor header files that are included, directly or
+# 		 indirectly, from such a header.
+# -MF <file>: When used with '-M' or '-MM', specifies a file to write the
+#  						dependencies to. When used with the driver options '-MD' or
+#  						'-MMD', '-MF' overrides the default dependency output file.
+# -MP: This option instructs CPP to add a phony target for each dependency
+#  		 other than the main file, causing each to depend on nothing.
 # -MT <target>: Change the target of the rule emitted by dependency generation.
-# -MD: '-MD' is equivalent to -M -MF <file>, except that '-E' is not implied.
+# -MD: '-MD' is equivalent to '-M -MF <file>', except that '-E' is not implied.
+# -MMD: Like '-MD' except mention only user header files, not system header
+#  			files.
 CC_FLAGS	:= $(CPU) -fno-common -fsigned-char -fmessage-length=0	\
 						 -Wall -Wextra -Wshadow	\
 						 -Os -ffunction-sections -fdata-sections	\
@@ -146,20 +142,18 @@ $(BIN_DIR)/$(TARGET).elf: $(OBJS)
 	@$(SIZE) --format=berkeley $@
 
 $(OBJ_DIR)/%.o: %.s
-	@mkdir -p $(OBJ_DIR)/$(dir $<)
-	@$(AS) $(AS_FLAGS) -o $@ $<
+	@$(AS) $(AS_FLAGS) -c $< -o $@
 
 $(OBJ_DIR)/%.o: %.c
-	@mkdir -p $(OBJ_DIR)/$(dir $<)
 	@$(CC) $(CC_FLAGS) $(CC_SYMBOLS) $(INCLUDES) -std=c11 -o $@ -c $<
-	@$(CC) $(CC_FLAGS) $(CC_SYMBOLS) $(INCLUDES) -MM -MT $@ $< -o $(DEP_DIR)/$(notdir $(basename $<).d)
+	@$(CC) $(CC_FLAGS) $(CC_SYMBOLS) $(INCLUDES) -M -MP -MT $@ -MF $(DEP_DIR)/$(notdir $(basename $<).d) $<
 
 clean:
 	@echo "\033[31m [ CLEAN - $(BOARD)_$(APP) ]\033[0m"
 	@rm -rf $(BIN_DIR) $(BUILD_DIR)
 
-# If you want make to simply ignore a makefile which  does not exist or cannot
+# If you want make to simply ignore a makefile which does not exist or cannot
 # be remade, with no error message, use the '-include' directive.
 ifneq ($(MAKECMDGOALS), clean)
-	-include $(DEP_DIR)/$(DEPS)
+-include $(DEPS)
 endif
